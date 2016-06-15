@@ -293,13 +293,16 @@ function the_review_data($data_name) {
 	echo strval(get_review_data($data_name));
 }
 
+function get_reviews_when_in_admin_message() { ?>
+    <div class="notice notice-info is-dismissable"><p>Fetching Google Reviews</p></div>
+<?php }
 
 function get_reviews_when_in_admin() {
 	global $post_type;
 	if ((isset($_GET['post_type']) && $_GET['post_type'] === 'tf_testimonial') || (isset($post_type) && $post_type === 'tf_testimonial')) {
 		if (!get_transient('tf_google_admin_fetch')) {
 			set_transient('tf_google_admin_fetch', '1', 60 * 5 /* 5 mins */);
-			echo 'Fetching Google Reviews';
+			add_action('admin_notices', 'get_reviews_when_in_admin_message');
 			tf_get_google_reviews();
 		}
 	}
