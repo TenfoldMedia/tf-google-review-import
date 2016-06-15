@@ -121,7 +121,8 @@ function tf_do_request($url) {
 	}
 	else { $response = json_decode($data['body'], true); }
 
-	return $response;
+	if (isset($response['error_message'])) { return false; }
+	else { return $response; }
 }
 
 function tf_fetch_and_process_reviews() {
@@ -175,6 +176,8 @@ function tf_get_google_reviews() {
 
 	// Regenerate the data
 	$response = tf_fetch_and_process_reviews();
+
+	if (!$response) { return false; }
 
 	$reviews = $response['result']['reviews'];
 	$rating = $response['result']['rating'];
@@ -302,8 +305,8 @@ function get_reviews_when_in_admin() {
 	if ((isset($_GET['post_type']) && $_GET['post_type'] === 'tf_testimonial') || (isset($post_type) && $post_type === 'tf_testimonial')) {
 		if (!get_transient('tf_google_admin_fetch')) {
 			set_transient('tf_google_admin_fetch', '1', 60 * 5 /* 5 mins */);
-			add_action('admin_notices', 'get_reviews_when_in_admin_message');
 			tf_get_google_reviews();
+			add_action('admin_notices', 'get_reviews_when_in_admin_message');
 		}
 	}
 }
