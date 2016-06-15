@@ -125,7 +125,7 @@ function tf_do_request($url) {
 }
 
 function tf_fetch_and_process_reviews() {
-	$google_api_key = 'AIzaSyBwJA1iPOXthbe2GGbWu770EO6fcjmpjS4';
+	$google_api_key = 'AIzaSyDpT17fnGVSAG8D9TqVV2aUPepN1yW_CYI';
 	$placeid = 'ChIJDeM_6sF5dkgRBTv9KMQECZo';
 
 	$place_reviews_url = add_query_arg(
