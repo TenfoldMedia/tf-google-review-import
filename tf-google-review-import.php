@@ -5,7 +5,7 @@ Plugin URI:        https://tenfold.media
 Description:       Imports Tenfold Media Google Reviews and stores them as a custom post type
 Author:            Tim Rye
 Author URI:        https://tenfold.media/tim
-Version:           1.0.0
+Version:           1.1.0
 GitHub Plugin URI: TenfoldMedia/tf-google-review-import
 GitHub Branch:     master
 ******************************************************************/
@@ -181,7 +181,6 @@ function tf_get_google_reviews() {
 
 	$reviews = $response['result']['reviews'];
 	$rating = $response['result']['rating'];
-	$rating_count = $response['result']['user_ratings_total'];
 
 	// Get the number of published testimonials (only ones shown on the testimonials page are counted)
 	$review_count = 0;
@@ -200,7 +199,6 @@ function tf_get_google_reviews() {
 	set_transient('tf_google_reviews', $reviews, $expiration);
 	set_transient('tf_google_rating', $rating, $expiration);
 	set_transient('tf_google_review_count', $review_count, $expiration);
-	set_transient('tf_google_rating_count', $rating_count, $expiration);
 
 	// If we have reviews
 	if (isset($reviews) && !empty($reviews)) {
@@ -274,20 +272,17 @@ function we_have_this($var) {
 function get_review_data($data_name) {
 	$rating = get_transient('tf_google_rating');
 	$review_count = get_transient('tf_google_review_count');
-	$rating_count = get_transient('tf_google_rating_count');
 
-	if (!we_have_this($rating) || !we_have_this($review_count) || !we_have_this($rating_count)) {
+	if (!we_have_this($rating) || !we_have_this($review_count)) {
 		tf_get_google_reviews();
 
 		$rating = get_transient('tf_google_rating');
 		$review_count = get_transient('tf_google_review_count');
-		$rating_count = get_transient('tf_google_rating_count');
 	}
 
 	switch ($data_name) {
 		case 'rating':       return $rating;
 		case 'review_count': return $review_count;
-		case 'rating_count': return $rating_count;
 		case 'num_stars':    return round(floatval($rating) * 2) / 2;
 	}
 }
