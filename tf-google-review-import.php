@@ -10,6 +10,7 @@ GitHub Plugin URI: TenfoldMedia/tf-google-review-import
 GitHub Branch:     master
 ******************************************************************/
 
+
 /**********************************************
   SET UP THE CUSTOM POST TYPE
 **********************************************/
@@ -71,7 +72,6 @@ function custom_post_tf_testimonial() {
 }
 add_action('init', 'custom_post_tf_testimonial');
 
-
 // Add custom post types counts to dashboard
 function custom_glance_items_testimonials( $items = array() ) {
     $post_types = array('tf_testimonial');
@@ -102,7 +102,6 @@ add_filter('dashboard_glance_items', 'custom_glance_items_testimonials', 10, 1);
 **********************************************/
 
 function tf_do_request($url) {
-
 	// Send API Call using WP's HTTP API
 	$data = wp_remote_get($url);
 
@@ -113,14 +112,12 @@ function tf_do_request($url) {
 
 	// If that failed, use CURL
 	if (!is_array($data) || empty($data['body'])) {
-
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		$data = curl_exec($ch); // Google response
 		curl_close($ch);
 		$response = json_decode($data, true);
-
 	}
 	else { $response = json_decode($data['body'], true); }
 
@@ -128,7 +125,6 @@ function tf_do_request($url) {
 }
 
 function tf_fetch_and_process_reviews() {
-
 	$google_api_key = 'AIzaSyBwJA1iPOXthbe2GGbWu770EO6fcjmpjS4';
 	$placeid = 'ChIJDeM_6sF5dkgRBTv9KMQECZo';
 
@@ -143,20 +139,20 @@ function tf_fetch_and_process_reviews() {
 	$response = tf_do_request($place_reviews_url);
 
 	// Get user avatar images
-	if ( isset( $response['result']['reviews'] ) && !empty( $response['result']['reviews'] ) ) {
+	if (isset($response['result']['reviews']) && !empty($response['result']['reviews'])) {
 
 		$tf_reviews = array();
 
 		// Loop through the reviews
-		foreach ( $response['result']['reviews'] as $review ) {
+		foreach ($response['result']['reviews'] as $review) {
 
 			// Get the Google User ID
-			$user_id = isset( $review['author_url'] ) ? str_replace( 'https://plus.google.com/', '', $review['author_url'] ) : '';
+			$user_id = isset($review['author_url']) ? str_replace('https://plus.google.com/', '', $review['author_url']) : '';
 
 			// Make the URL of the Google User's avatar image
 			$image_request_url = add_query_arg(
-				array( 'alt' => 'json', ),
-				'http://picasaweb.google.com/data/entry/api/user/' . $user_id
+				array('alt' => 'json'),
+				'http://picasaweb.google.com/data/entry/api/user/'.$user_id
 			);
 
 			$avatar_get_body = tf_do_request($image_request_url);
@@ -164,9 +160,9 @@ function tf_fetch_and_process_reviews() {
 			$avatar_img = $avatar_get_body['entry']['gphoto$thumbnail']['$t'];
 
 			//add array image to review array
-			$review = array_merge( $review, array( 'avatar' => $avatar_img ) );
+			$review = array_merge($review, array('avatar' => $avatar_img));
 
-			array_push( $tf_reviews, $review );
+			array_push($tf_reviews, $review);
 		}
 
 		$response['result']['reviews'] = $tf_reviews;
